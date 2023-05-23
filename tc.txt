@@ -1,4 +1,3 @@
-
   public static void resetSequenceIfNewDate(Long sysOrgId, PlatformUserContext userContext) {
     PlatformUserContext vcContext = UserContextDomain.getVCAdminContext();
     ModelDataService mds = Services.get(ModelDataService.class);
