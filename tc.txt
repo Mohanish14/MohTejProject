@@ -1,0 +1,28 @@
+
+  public static void resetSequenceIfNewDate(Long sysOrgId, PlatformUserContext userContext) {
+    PlatformUserContext vcContext = UserContextDomain.getVCAdminContext();
+    ModelDataService mds = Services.get(ModelDataService.class);
+    SqlParams params = new SqlParams();
+    params.setLongValue("SYS_ORG_ID", sysOrgId);
+    List<Organization> org = mds.read(
+      Organization.class,
+      vcContext,
+      params,
+      ModelQuery.sqlFilter("SYS_ORG_ID LIKE $SYS_ORG_ID$"));
+
+    if (org != null && org.get(0) != null) {
+      Calendar lastDocGenDate = org.get(0).getMDFs(OrganizationMDFs.class).getLastDocGenDate();
+      boolean sameDay;
+      if (lastDocGenDate == null) {
+        sameDay = false;
+      }
+      else {
+        Calendar nowDate = Calendar.getInstance();
+        sameDay = lastDocGenDate.get(Calendar.YEAR) == nowDate.get(Calendar.YEAR)
+          && lastDocGenDate.get(Calendar.DAY_OF_YEAR) == nowDate.get(Calendar.DAY_OF_YEAR);
+      }
+      if (!sameDay) {
+        setNewOrgSequence(sysOrgId, userContext);
+      }
+    }
+  }
